@@ -9,25 +9,44 @@ output: html_document
 library("factoextra")
 library("tidyverse")
 library("janitor")
+library("here")
 
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-iris_clean <- clean_names(iris)
+pokemon <- clean_names(read.csv("pokemon.csv"))
+#iris_clean <- clean_names(iris)
 
-clust_out <- eclust(iris_clean[,1:4], 
+pokemon_type <- pokemon %>% 
+    select(., -percentage_male) %>% 
+    drop_na() %>% 
+    .["type1"]
+
+pokemon_data <- pokemon %>% 
+    select_if(is.numeric) %>% 
+    select(., -percentage_male) %>% 
+    drop_na()
+
+clust_out <- eclust(pokemon_data, 
                      FUNcluster = 'kmeans', 
                      hc_metric = 'euclidean',
-                     k = 3, nstart = 25, graph = FALSE)
+                     k = 2, nstart = 25, graph = FALSE)
+ 
+# str(clust_out)
+# mclust::clPairs(pokemon_data, clust_out$cluster)
 
-str(clust_out)
+cluster <- clust_out$cluster
+clust_data <- cbind( cluster, pokemon_type, pokemon_data)
 
-clust_data <- cbind(clust_out[1], iris_clean)
 
-plot_data <- clust_data %>% mutate(cluster = as.factor(cluster)) %>% 
-    gather(sepal_length, sepal_width, petal_length, petal_width, 
-           value = value, key = variable_name) 
+
+
+
+
+plot_data <- clust_data %>% 
+    mutate(cluster = as.character(cluster), pokemon_type = as.character(pokemon_type)) %>% 
+    gather(., value = value, key = variable_name, -pokemon_type, -cluster) 
 
 plot_data %>% 
     ggplot(aes(x = variable_name, y = value, color = cluster)) +
