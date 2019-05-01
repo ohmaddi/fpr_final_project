@@ -1,0 +1,55 @@
+---
+title: "Outline"
+author: "Brendan Cullen & Krista DeStasio"
+date: "5/1/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r Import and clean data}
+
+```
+
+
+```{r Pre-process data}
+
+```
+
+
+```{r K-means clustering}
+
+```
+
+# Visualizations
+
+```{r Scatterplot or Biplot}
+
+```
+
+
+```{r Boxplots}
+
+```
+
+
+```{r Sillouhette Plots}
+
+```
+
+
+```{r SPLOM plots}
+
+```
+
+
+```{r Table}
+# Centroid value (mean of cluster)
+# Within-cluster sum of squares
+# Number of observations per cluster
+
+```
+
