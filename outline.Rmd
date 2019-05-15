@@ -6,13 +6,20 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+library(janitor) 
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Set-up
 ```{r Import and clean data}
 # Read in the data
+pokemon <- clean_names(read.csv("pokemon.csv"))
 
+pokemon_type <- pokemon %>% 
+    select(-percentage_male, -type2) %>%   # Remove columns w/data for only a few pokemon.
+    drop_na() %>%   # Remove rows that contain NAs
+    select_if(is.numeric) %>%  # Drop columns of non-numeric data
+    scale()
 ```
 
 # Preprocessing
@@ -63,7 +70,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-```{r Table}
+```{r Tables}
 # Centroid value (mean of cluster; `centers` from kmeans output)
 # Within-cluster sum of squares for each cluster (`withinss` from the kmeans output)
 # Number of observations per cluster (`size` from kmeans output)
