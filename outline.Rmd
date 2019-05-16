@@ -14,13 +14,21 @@ knitr::opts_chunk$set(echo = TRUE)
 # Set-up
 ```{r Import and clean data}
 # Read in the data
-pokemon <- clean_names(read.csv("pokemon.csv"))
+pokemon_data <- clean_names(read.csv("pokemon.csv"))
 
-pokemon_data <- pokemon %>% 
-    select(-percentage_male, -type2) %>%   # Remove columns w/data for only a few pokemon.
-    drop_na() %>%   # Remove rows that contain NAs
-    select_if(is.numeric) %>%  # Drop columns of non-numeric data
-    scale()
+# Code the data types appropriately
+vars <- c("is_legendary", "generation", "pokedex_number") 
+pokemon_data[vars] <- lapply(pokemon_data[vars], factor) 
+
+# Create a data fram without missing values that contains the type1 labels
+pokemon_data <- pokemon_data %>% 
+    select(-percentage_male, -type2) %>%   # Few poke have data for these
+    drop_na() 
+    
+# Drop any non-numeric variables
+pokemon_num <- pokemon_data %>% 
+    select_if(is.numeric) %>%  
+    scale() %>% as.data.frame()
 ```
 
 # Preprocessing
