@@ -7,6 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 library(janitor) 
+library(tidyverse)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -15,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Read in the data
 pokemon <- clean_names(read.csv("pokemon.csv"))
 
-pokemon_type <- pokemon %>% 
+pokemon_data <- pokemon %>% 
     select(-percentage_male, -type2) %>%   # Remove columns w/data for only a few pokemon.
     drop_na() %>%   # Remove rows that contain NAs
     select_if(is.numeric) %>%  # Drop columns of non-numeric data
@@ -24,7 +25,7 @@ pokemon_type <- pokemon %>%
 
 # Preprocessing
 ```{r Missing observations}
-
+table(is.na(pokemon_data)) # we good
 ```
 
 
