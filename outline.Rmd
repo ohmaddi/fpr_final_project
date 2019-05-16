@@ -28,7 +28,7 @@ pokemon_data <- pokemon_data %>%
 # Drop any non-numeric variables
 pokemon_num <- pokemon_data %>% 
     select_if(is.numeric) %>%  
-    scale() %>% as.data.frame()
+    as.data.frame()
 ```
 
 # Preprocessing
@@ -42,18 +42,25 @@ table(is.na(pokemon_data)) # we good
 ```
 
 
-```{rZero and near-zero variance}
-
+```{r, Zero and near-zero variance}
+caret::nearZeroVar(pokemon_num, saveMetrics = TRUE) 
 ```
 
 
 ```{r Multicolinearity.}
+caret::findLinearCombos(pokemon_num) 
 
+# Remove speed since it is a linear combination of other variables
+pokemon_num <- dplyr::select(pokemon_num, -speed)
 ```
 
 
 ```{r Data scaling}
+pokemon_num <- pokemon_num %>% scale()
 
+# Check the scaling
+round(colMeans(pokemon_num), 2)
+apply(pokemon_num, 2, sd)
 ```
 
 
