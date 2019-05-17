@@ -71,8 +71,15 @@ apply(pokemon_num, 2, sd)
 
 # Visualizations
 
-```{r Scatterplot or Biplt}
+```{r Scatterplot or Biplot}
 
+scat_plot <- function(df, plot_data) {
+    nclusts <- max(unique(df$cluster))
+    
+    plot(plot_data, 
+         col = df$cluster, 
+         main = paste(nclusts, "clusters:", deparse(substitute(df))))
+}
 ```
 
 
