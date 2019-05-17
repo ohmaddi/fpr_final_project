@@ -63,10 +63,15 @@ round(colMeans(pokemon_num), 2)
 apply(pokemon_num, 2, sd)
 ```
 
+# Run K-means clustering with variable numbers of clusters
+
+```{r}
+
+```
 
 # Visualizations
 
-```{r Scatterplot or Biplot}
+```{r Scatterplot or Biplt}
 
 ```
 
