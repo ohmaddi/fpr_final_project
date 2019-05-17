@@ -8,6 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 library(janitor) 
 library(tidyverse)
+library(factoextra)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -26,7 +27,7 @@ pokemon_data <- pokemon_data %>%
     drop_na() 
     
 # Drop any non-numeric variables
-pokemon_num <- pokemon_data %>% 
+pokemon_numeric <- pokemon_data %>% 
     select_if(is.numeric) %>%  
     as.data.frame()
 ```
@@ -43,43 +44,57 @@ table(is.na(pokemon_data)) # we good
 
 
 ```{r, Zero and near-zero variance}
-caret::nearZeroVar(pokemon_num, saveMetrics = TRUE) 
+caret::nearZeroVar(pokemon_numeric, saveMetrics = TRUE) # we good
 ```
 
 
 ```{r Multicolinearity.}
-caret::findLinearCombos(pokemon_num) 
+caret::findLinearCombos(pokemon_numeric) 
 
 # Remove speed since it is a linear combination of other variables
-pokemon_num <- dplyr::select(pokemon_num, -speed)
+pokemon_numeric <- dplyr::select(pokemon_numeric, -speed)
 ```
 
 
 ```{r Data scaling}
-pokemon_num <- pokemon_num %>% scale()
+pokemon_numeric <- pokemon_numeric %>% scale()
 
 # Check the scaling
-round(colMeans(pokemon_num), 2)
-apply(pokemon_num, 2, sd)
+round(colMeans(pokemon_numeric), 2)
+apply(pokemon_numeric, 2, sd)
 ```
 
 # Run K-means clustering with variable numbers of clusters
 
 ```{r}
+run_clust <- function(df, k) {
+    eclust(df,
+           FUNcluster = 'kmeans',
+           hc_metric = 'euclidean',
+           k = k, nstart = 25, graph = TRUE)
+}
+```
 
+Test, run with 
+```{r}
+pokemon_kmeans <- run_clust(pokemon_numeric, 3)
 ```
 
 # Visualizations
 
 ```{r Scatterplot or Biplot}
 
-scat_plot <- function(df, plot_data) {
-    nclusts <- max(unique(df$cluster))
-    
+scat_plot <- function(cluster_data, plot_data) {
+    nclusts <- max(unique(cluster_data$cluster))
     plot(plot_data, 
-         col = df$cluster, 
-         main = paste(nclusts, "clusters:", deparse(substitute(df))))
+         col = cluster_data$cluster, 
+         main = paste(nclusts, "clusters:", deparse(substitute(cluster_data))))
 }
+```
+
+Test it
+```{r}
+scat_plot(pokemon_kmeans, pokemon_data)
 ```
 
 
