@@ -29,7 +29,7 @@ pokemon_data <- pokemon_data %>%
 # Drop any non-numeric variables
 pokemon_numeric <- pokemon_data %>% 
     select_if(is.numeric) %>%  
-    as.data.frame()
+    as.data.frame(.)
 ```
 
 # Preprocessing
@@ -57,7 +57,7 @@ pokemon_numeric <- dplyr::select(pokemon_numeric, -speed)
 
 
 ```{r Data scaling}
-pokemon_numeric <- pokemon_numeric %>% scale()
+pokemon_numeric <- pokemon_numeric %>% scale() %>% as.data.frame(.)
 
 # Check the scaling
 round(colMeans(pokemon_numeric), 2)
@@ -77,13 +77,13 @@ run_clust <- function(df, k) {
 
 Test, run with 
 ```{r}
+rownames(pokemon_numeric) <- c()
 pokemon_kmeans <- run_clust(pokemon_numeric, 3)
 ```
 
 # Visualizations
 
 ```{r Scatterplot or Biplot}
-
 scat_plot <- function(cluster_data, plot_data) {
     nclusts <- max(unique(cluster_data$cluster))
     plot(plot_data, 
