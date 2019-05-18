@@ -3,12 +3,15 @@ title: "Outline"
 author: "Brendan Cullen & Krista DeStasio"
 date: "5/1/2019"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
 library(janitor) 
 library(tidyverse)
 library(factoextra)
+library(RColorBrewer)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -23,9 +26,11 @@ pokemon_data[vars] <- lapply(pokemon_data[vars], factor)
 
 # Create a data fram without missing values that contains the type1 labels
 pokemon_data <- pokemon_data %>% 
-    select(-percentage_male, -type2) %>%   # Few poke have data for these
+    select(-percentage_male, -type2) %>%  
+    filter(type1 %in% c("ghost", "fairy", "dragon")) %>%  # Let's limit this to a few pokemon
+    mutate(type1 = droplevels(type1)) %>% # Few poke have data for these
     drop_na() 
-    
+
 # Drop any non-numeric variables
 pokemon_numeric <- pokemon_data %>% 
     select_if(is.numeric) %>%  
@@ -78,7 +83,40 @@ run_clust <- function(df, k) {
 Test, run with 
 ```{r}
 rownames(pokemon_numeric) <- c()
-pokemon_kmeans <- run_clust(pokemon_numeric, 3)
+sub <- pokemon_numeric %>% select(., c(starts_with("against"), hp))
+#pokemon_kmeans <- run_clust(pokemon_numeric, 4)
+pokemon_kmeans <- run_clust(sub, 6)
+
+# Expand pallette to make silhouette plot
+#colourCount = length(unique(pokemon_data$type1))
+#getPalette = colorRampPalette(brewer.pal(9, "Set1"))
+
+# Make silplot
+fviz_silhouette(pokemon_kmeans, palette = "jco", 
+                print.summary = FALSE, 
+                ggtheme = theme_minimal())# +
+    #scale_fill_manual(values = getPalette(colourCount))
+
+# Plot clusters facetted on type
+plot_data <- cbind(pokemon_kmeans$cluster, pokemon_data) %>%  
+    mutate(cluster = as.character(pokemon_kmeans$cluster), pokemon_type = as.character(type1)) %>% 
+    gather(., value = value, key = variable_name, -pokemon_type, -cluster) 
+
+plot_data$cluster <- as_factor(plot_data$cluster)
+plot_data$pokemon_type <- as_factor(plot_data$pokemon_type)
+
+plot_data %>% 
+    ggplot(aes(x = variable_name, y = value, color = cluster)) +
+    geom_jitter() + 
+    facet_wrap(~pokemon_type) +
+    ylab(label = "")
+
+# Plot average silhouette plot
+fviz_nbclust(pokemon_numeric, kmeans, method = "silhouette", k.max = 32) + theme_classic()
+```
+
+```{r}
+
 ```
 
 # Visualizations
@@ -94,7 +132,7 @@ scat_plot <- function(cluster_data, plot_data) {
 
 Test it
 ```{r}
-scat_plot(pokemon_kmeans, pokemon_data)
+map(pokemon_numeric, ~hist(.x))
 ```
 
 
@@ -104,7 +142,9 @@ scat_plot(pokemon_kmeans, pokemon_data)
 
 
 ```{r Sillouhette Plots}
-
+fviz_silhouette(pokemon_kmeans, palette = "jco", 
+                print.summary = FALSE, 
+                ggtheme = theme_minimal())
 ```
 
 
