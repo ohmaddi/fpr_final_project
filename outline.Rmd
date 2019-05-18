@@ -24,7 +24,7 @@ pokemon_data <- clean_names(read.csv("pokemon.csv"))
 vars <- c("is_legendary", "generation", "pokedex_number") 
 pokemon_data[vars] <- lapply(pokemon_data[vars], factor) 
 
-# Create a data fram without missing values that contains the type1 labels
+# Create a data frame without missing values that contains the type1 labels
 pokemon_data <- pokemon_data %>% 
     select(-percentage_male, -type2) %>%  
     filter(type1 %in% c("ghost", "fairy", "dragon")) %>%  # Let's limit this to a few pokemon
@@ -35,6 +35,14 @@ pokemon_data <- pokemon_data %>%
 pokemon_numeric <- pokemon_data %>% 
     select_if(is.numeric) %>%  
     as.data.frame(.)
+
+# Create data frame with "against" variables 
+pokemon_against <- pokemon_numeric %>% 
+    select(starts_with("against"))
+
+# Create data frame with all other variables
+pokemon_other <- pokemon_numeric %>% 
+    select(-starts_with("against"))
 ```
 
 # Preprocessing
@@ -62,12 +70,26 @@ pokemon_numeric <- dplyr::select(pokemon_numeric, -speed)
 
 
 ```{r Data scaling}
-pokemon_numeric <- pokemon_numeric %>% scale() %>% as.data.frame(.)
+pokemon_numeric <- pokemon_numeric %>% 
+    scale() %>% 
+    as.data.frame(.)
 
 # Check the scaling
 round(colMeans(pokemon_numeric), 2)
 apply(pokemon_numeric, 2, sd)
 ```
+
+```{r PCA}
+pokemon_scaled_pca <- prcomp(x = pokemon_numeric)
+
+biplot(pokemon_scaled_pca)
+
+pca_summary_pokemon <- summary(pokemon_scaled_pca)
+
+knitr::kable(pca_summary_pokemon$importance, digits = 2, 
+      caption = 'PCA Summary Table, Pokemon Dataset')
+```
+
 
 # Run K-means clustering with variable numbers of clusters
 
@@ -131,11 +153,6 @@ scat_plot <- function(cluster_data, plot_data) {
 ```
 
 Test it
-```{r}
-map(pokemon_numeric, ~hist(.x))
-```
-
-
 ```{r Boxplots}
 
 ```
