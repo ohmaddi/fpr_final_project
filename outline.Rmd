@@ -152,17 +152,22 @@ plot_data %>%
     facet_wrap(~pokemon_type)
 
 # "Against" variables
-plot_data <- cbind(pokemon_against_km$cluster, pokemon_data) %>%  
-    mutate(cluster = as.character(pokemon_against_km$cluster), pokemon_type = as.character(type1)) %>% 
-    gather(., value = value, key = variable_name, -pokemon_type, -cluster) 
+plot_data <- cbind(pokemon_against_km$cluster, pokemon_against, pokemon_data$type1) %>%  
+  rename(cluster = `pokemon_against_km$cluster`,
+         type = `pokemon_data$type1`) %>% 
+    mutate(cluster = as.character(cluster), 
+           type = as.character(type)) %>% 
+    gather(value = value, key = variable_name, -type, -cluster) 
 
 plot_data$cluster <- as_factor(plot_data$cluster)
 plot_data$pokemon_type <- as_factor(plot_data$pokemon_type)
 
 plot_data %>% 
     ggplot(aes(x = variable_name, y = value, color = cluster)) +
-    geom_jitter() + 
-    facet_wrap(~pokemon_type)
+    geom_jitter(alpha = 0.3) + 
+  coord_flip() +
+    facet_wrap(~type) +
+  theme_minimal()
 
 ## Other (non-against) variables
 plot_data <- cbind(pokemon_other_km$cluster, pokemon_data) %>%  
