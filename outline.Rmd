@@ -38,11 +38,13 @@ pokemon_numeric <- pokemon_data %>%
 
 # Create data frame with "against" variables 
 pokemon_against <- pokemon_numeric %>% 
-    select(starts_with("against"))
+    select(starts_with("against"), hp)
 
 # Create data frame with all other variables
 pokemon_other <- pokemon_numeric %>% 
     select(-starts_with("against"))
+pokemon_datacamp <- pokemon_numeric %>% 
+    select(hp, attack, defense, sp_attack, sp_defense)
 ```
 
 # Preprocessing
@@ -57,12 +59,12 @@ table(is.na(pokemon_data)) # we good
 
 
 ```{r, Zero and near-zero variance}
-caret::nearZeroVar(pokemon_numeric, saveMetrics = TRUE) # we good
+#caret::nearZeroVar(pokemon_numeric, saveMetrics = TRUE) # we good
 ```
 
 
 ```{r Multicolinearity.}
-caret::findLinearCombos(pokemon_numeric) 
+#caret::findLinearCombos(pokemon_numeric) 
 
 # Remove speed since it is a linear combination of other variables
 pokemon_numeric <- dplyr::select(pokemon_numeric, -speed)
@@ -74,20 +76,31 @@ pokemon_numeric <- pokemon_numeric %>%
     scale() %>% 
     as.data.frame(.)
 
+pokemon_other <- pokemon_other %>% 
+    scale() %>% 
+    as.data.frame(.)
+
+pokemon_datacamp <- pokemon_datacamp %>% 
+    scale() %>% 
+    as.data.frame(.)
+
+pokemon_against <- pokemon_against %>% 
+    scale() %>% 
+    as.data.frame(.)
 # Check the scaling
-round(colMeans(pokemon_numeric), 2)
-apply(pokemon_numeric, 2, sd)
+#round(colMeans(pokemon_numeric), 2)
+#apply(pokemon_numeric, 2, sd)
 ```
 
 ```{r PCA}
-pokemon_scaled_pca <- prcomp(x = pokemon_numeric)
-
-biplot(pokemon_scaled_pca)
-
-pca_summary_pokemon <- summary(pokemon_scaled_pca)
-
-knitr::kable(pca_summary_pokemon$importance, digits = 2, 
-      caption = 'PCA Summary Table, Pokemon Dataset')
+# pokemon_scaled_pca <- prcomp(x = pokemon_numeric)
+# 
+# biplot(pokemon_scaled_pca)
+# 
+# pca_summary_pokemon <- summary(pokemon_scaled_pca)
+# 
+# knitr::kable(pca_summary_pokemon$importance, digits = 2, 
+#       caption = 'PCA Summary Table, Pokemon Dataset')
 ```
 
 
@@ -104,24 +117,30 @@ run_clust <- function(df, k) {
 
 Test, run with 
 ```{r}
-rownames(pokemon_numeric) <- c()
-sub <- pokemon_numeric %>% select(., c(starts_with("against"), hp))
-#pokemon_kmeans <- run_clust(pokemon_numeric, 4)
-pokemon_kmeans <- run_clust(sub, 6)
+set.seed(4966)
+#rownames(pokemon_numeric) <- c()
 
-# Expand pallette to make silhouette plot
-#colourCount = length(unique(pokemon_data$type1))
-#getPalette = colorRampPalette(brewer.pal(9, "Set1"))
+pokemon_datacamp_km <- run_clust(pokemon_datacamp, 3)
+pokemon_against_km <- run_clust(pokemon_against, 3)
+pokemon_other_km <- run_clust(pokemon_other, 3)
+```
 
+```{r}
+set.seed(4966)
 # Make silplot
-fviz_silhouette(pokemon_kmeans, palette = "jco", 
+fviz_silhouette(pokemon_datacamp_km, palette = "jco", 
                 print.summary = FALSE, 
-                ggtheme = theme_minimal())# +
-    #scale_fill_manual(values = getPalette(colourCount))
+                ggtheme = theme_minimal()) 
+fviz_silhouette(pokemon_against_km, palette = "jco", 
+                print.summary = FALSE, 
+                ggtheme = theme_minimal()) 
+fviz_silhouette(pokemon_other_km, palette = "jco", 
+                print.summary = FALSE, 
+                ggtheme = theme_minimal())
 
-# Plot clusters facetted on type
-plot_data <- cbind(pokemon_kmeans$cluster, pokemon_data) %>%  
-    mutate(cluster = as.character(pokemon_kmeans$cluster), pokemon_type = as.character(type1)) %>% 
+## datacamp variables
+plot_data <- cbind(pokemon_datacamp_km$cluster, pokemon_data) %>%  
+    mutate(cluster = as.character(pokemon_datacamp_km$cluster), pokemon_type = as.character(type1)) %>% 
     gather(., value = value, key = variable_name, -pokemon_type, -cluster) 
 
 plot_data$cluster <- as_factor(plot_data$cluster)
@@ -130,11 +149,38 @@ plot_data$pokemon_type <- as_factor(plot_data$pokemon_type)
 plot_data %>% 
     ggplot(aes(x = variable_name, y = value, color = cluster)) +
     geom_jitter() + 
-    facet_wrap(~pokemon_type) +
-    ylab(label = "")
+    facet_wrap(~pokemon_type)
+
+# "Against" variables
+plot_data <- cbind(pokemon_against_km$cluster, pokemon_data) %>%  
+    mutate(cluster = as.character(pokemon_against_km$cluster), pokemon_type = as.character(type1)) %>% 
+    gather(., value = value, key = variable_name, -pokemon_type, -cluster) 
+
+plot_data$cluster <- as_factor(plot_data$cluster)
+plot_data$pokemon_type <- as_factor(plot_data$pokemon_type)
+
+plot_data %>% 
+    ggplot(aes(x = variable_name, y = value, color = cluster)) +
+    geom_jitter() + 
+    facet_wrap(~pokemon_type)
+
+## Other (non-against) variables
+plot_data <- cbind(pokemon_other_km$cluster, pokemon_data) %>%  
+    mutate(cluster = as.character(pokemon_other_km$cluster), pokemon_type = as.character(type1)) %>% 
+    gather(., value = value, key = variable_name, -pokemon_type, -cluster) 
+
+plot_data$cluster <- as_factor(plot_data$cluster)
+plot_data$pokemon_type <- as_factor(plot_data$pokemon_type)
+
+plot_data %>% 
+    ggplot(aes(x = variable_name, y = value, color = cluster)) +
+    geom_jitter() + 
+    facet_wrap(~pokemon_type)
 
 # Plot average silhouette plot
-fviz_nbclust(pokemon_numeric, kmeans, method = "silhouette", k.max = 32) + theme_classic()
+fviz_nbclust(pokemon_datacamp, kmeans, method = "silhouette", k.max = 32) + theme_classic()
+fviz_nbclust(pokemon_against, kmeans, method = "silhouette", k.max = 40) + theme_classic()
+fviz_nbclust(pokemon_other, kmeans, method = "silhouette", k.max = 32) + theme_classic()
 ```
 
 ```{r}
