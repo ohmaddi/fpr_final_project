@@ -118,10 +118,10 @@ k <- pokemon_against_km$nbclust
 clust_num <- map_chr(seq(1:k), ~paste("Cluster", .x))
 
 # ss-within
-wss <- pokemon_against_km$withinss
+wss <- round(pokemon_against_km$withinss, 2)
 
 # ss-between
-bss <- rep(pokemon_against_km$betweenss, k)
+bss <- round(rep(pokemon_against_km$betweenss, k), 2)
 
 # n observations per cluster
 nobs <- pokemon_against_km$size
@@ -136,6 +136,13 @@ neg_sil_clust <- pokemon_against_km$silinfo$widths[, c("cluster","sil_width")] %
 
 neg_sil[neg_sil_clust$cluster] <- neg_sil_clust$neg_sil 
 
-data.frame(clust_num, nobs, wss, bss, neg_sil) 
+table_data <- data.frame(clust_num, nobs, wss, bss, neg_sil) 
+
+table_data %>% 
+  datatable(rownames = FALSE, 
+            colnames= c("Cluster", "N", "Within SS", "Between SS", "Neg. Silhouette"),
+            caption = htmltools::tags$caption(
+              style = 'caption-side: bottom; text-align: left;',
+              htmltools::em('N = number of observations per cluster; SS = sum of squares')))
 ```
 
