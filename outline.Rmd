@@ -55,7 +55,6 @@ pokemon_against <- pokemon_against %>%
     as.data.frame()
 ```
 
-
 # Run K-means clustering with variable numbers of clusters
 ```{r}
 run_clust <- function(df, k) {
@@ -70,7 +69,7 @@ run_clust <- function(df, k) {
 ```{r}
 rownames(pokemon_against) <- c() # need to remove rownames in order to get atomic vector output for cluster membership data
 
-pokemon_against_km <- run_clust(pokemon_against, 2)
+pokemon_against_km <- run_clust(pokemon_against, 6)
 ```
 
 # Visualizations
@@ -87,14 +86,9 @@ fviz_silhouette(pokemon_against_km, palette = "jco",
 fviz_nbclust(pokemon_against, kmeans, method = "silhouette", k.max = 6) + theme_classic()
 ```
 
-
 ```{r Cluster plot}
 pokemon_against_km$clust_plot + 
   theme_minimal()
-```
-
-```{r SPLOM plots}
-
 ```
 
 ```{r Facet by type}
@@ -109,7 +103,7 @@ plot_data <- cbind(pokemon_against_km$cluster, pokemon_against, pokemon_data$typ
 # Plot clusters by pokemon type
 plot_data %>% 
     ggplot(aes(x = variable_name, y = value, color = cluster)) +
-    geom_jitter(alpha = 0.3) + 
+    geom_jitter(alpha = 0.6) + 
   coord_flip() +
     facet_wrap(~type) +
   theme_minimal()
@@ -117,9 +111,31 @@ plot_data %>%
 
 
 ```{r Tables}
-# Centroid value (mean of cluster; `centers` from kmeans output)
-# Within-cluster sum of squares for each cluster (`withinss` from the kmeans output)
-# Number of observations per cluster (`size` from kmeans output)
+# number of clusters 
+k <- pokemon_against_km$nbclust
 
+# cluster number
+clust_num <- map_chr(seq(1:k), ~paste("Cluster", .x))
+
+# ss-within
+wss <- pokemon_against_km$withinss
+
+# ss-between
+bss <- rep(pokemon_against_km$betweenss, k)
+
+# n observations per cluster
+nobs <- pokemon_against_km$size
+
+# number of observations with negative sil value (misclassified)
+neg_sil <- rep(0, k)
+
+neg_sil_clust <- pokemon_against_km$silinfo$widths[, c("cluster","sil_width")] %>% 
+  filter(sil_width < 0) %>% 
+  group_by(cluster) %>% 
+  summarize(neg_sil = n())
+
+neg_sil[neg_sil_clust$cluster] <- neg_sil_clust$neg_sil 
+
+data.frame(clust_num, nobs, wss, bss, neg_sil) 
 ```
 
