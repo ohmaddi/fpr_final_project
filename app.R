@@ -2,6 +2,14 @@
 library(shinydashboard)
 library(ggplot2)
 library(factoextra)
+library(here)
+
+clust2 <- loadObject(here("kmeans/clust2.Rda"))
+clust3 <- loadObject(here("kmeans/clust3.Rda"))
+clust4 <- loadObject(here("kmeans/clust4.Rda"))
+clust5 <- loadObject(here("kmeans/clust5.Rda"))
+clust6 <- loadObject(here("kmeans/clust6.Rda"))
+
 
 header <-
     dashboardHeader(title = "K-means Clustering of Pokemon Data")
@@ -24,12 +32,12 @@ body <- dashboardBody(
                         title = "Controls",
                         radioButtons("clusters",
                                      "Number of centroids to try:",
-                                     choices = c("2" = "pokemon_against_km2", 
-                                                 "3" = "pokemon_against_km3", 
-                                                 "4" = "pokemon_against_km4", 
-                                                 "5" = "pokemon_against_km5",
-                                                 "6" = "pokemon_against_km6"),
-                                     selected = "pokemon_against_km3")
+                                    c("2" = clust2, 
+                                                 "3" = "clust3", 
+                                                 "4" = "clust4", 
+                                                 "5" = "clust5",
+                                                 "6" = "clust6"),
+                                     selected = "clust2")
                     )
                 )
         ),
@@ -44,10 +52,12 @@ ui <- dashboardPage(header, sidebar, body)
 
 
 server <- function(input, output) {
+    data <- input$cluster
+    
     output$plot1 <-
         renderPlot({
             fviz_silhouette(
-                pokemon_against_km,
+                data,
                 palette = "jco",
                 print.summary = FALSE,
                 ggtheme = theme_minimal()
