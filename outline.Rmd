@@ -12,6 +12,7 @@ library(janitor)
 library(tidyverse)
 library(factoextra)
 library(RColorBrewer)
+library(DT)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -69,7 +70,7 @@ run_clust <- function(df, k) {
 ```{r}
 rownames(pokemon_against) <- c() # need to remove rownames in order to get atomic vector output for cluster membership data
 
-pokemon_against_km <- run_clust(pokemon_against, 3)
+pokemon_against_km <- run_clust(pokemon_against, 2)
 ```
 
 # Visualizations
