@@ -3,6 +3,7 @@ library(shinydashboard)
 library(ggplot2)
 library(factoextra)
 library(here)
+library(R.utils)
 
 clust2 <- loadObject(here("kmeans/clust2.Rda"))
 clust3 <- loadObject(here("kmeans/clust3.Rda"))
@@ -32,7 +33,7 @@ body <- dashboardBody(
                         title = "Controls",
                         radioButtons("clusters",
                                      "Number of centroids to try:",
-                                    c("2" = clust2, 
+                                    c("2" = "clust2", 
                                                  "3" = "clust3", 
                                                  "4" = "clust4", 
                                                  "5" = "clust5",
@@ -52,12 +53,12 @@ ui <- dashboardPage(header, sidebar, body)
 
 
 server <- function(input, output) {
-    data <- input$cluster
+    
     
     output$plot1 <-
         renderPlot({
             fviz_silhouette(
-                data,
+                clust2,
                 palette = "jco",
                 print.summary = FALSE,
                 ggtheme = theme_minimal()
