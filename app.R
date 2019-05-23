@@ -28,10 +28,11 @@ body <- dashboardBody(
         tabItem(tabName = "dashboard",
                 fluidRow(
                     box(plotOutput("plot1", height = 250)),
+                    box(plotOutput("plot2", height = 250)),
                     
                     box(
                         title = "Controls",
-                        radioButtons("clusters",
+                        selectInput("clusters",
                                      "Number of centroids to try:",
                                     c("2" = "clust2", 
                                                  "3" = "clust3", 
@@ -54,15 +55,22 @@ ui <- dashboardPage(header, sidebar, body)
 
 server <- function(input, output) {
     
-    
+
     output$plot1 <-
         renderPlot({
+            data <- get(input$clusters)
             fviz_silhouette(
-                clust2,
+                data,
                 palette = "jco",
                 print.summary = FALSE,
                 ggtheme = theme_minimal()
             )
+        })
+    
+    output$plot2 <-
+        renderPlot({
+            data <- get(input$clusters)
+            data$clust_plot
         })
     
 }
