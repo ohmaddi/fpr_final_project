@@ -7,7 +7,9 @@ library(tidyverse)
 library(janitor)
 library(DT)
 
-# Read in pokemone data
+
+# Read in pokemone data ---------------------------------------------------
+
 pokemon_data <- clean_names(read.csv("pokemon.csv"))  %>% 
     select(-percentage_male, -type2) %>%  
     filter(type1 %in% c("ghost", "fairy", "dragon")) %>%  # Let's limit this to a few pokemon
@@ -18,7 +20,9 @@ pokemon_data <- pokemon_data %>%
     select(starts_with("against"), hp) %>% 
     scale() %>% as.data.frame()
 
-## Load in output from k-means clustering
+
+# Load output from k-means clustering -------------------------------------
+
 #  turn this into a function!
 clust2 <- loadObject(here("kmeans/clust2.Rda"))
 clust3 <- loadObject(here("kmeans/clust3.Rda"))
@@ -27,48 +31,48 @@ clust5 <- loadObject(here("kmeans/clust5.Rda"))
 clust6 <- loadObject(here("kmeans/clust6.Rda"))
 
 
-## Define functions for creating tables
+
+
+# Custom functinos --------------------------------------------------------
 
 # function to create data for silhouette table
 get_sil_data <- function(clust){
-    # number of clusters 
-    k <- clust$nbclust
-    # cluster number
-    clust_num <- map_chr(seq(1:k), ~paste("Cluster", .x))
-    # ss-within
-    wss <- round(clust$withinss, 2)
-    # ss-between
-    bss <- round(rep(clust$betweenss, k), 2)
-    # n observations per cluster
-    nobs <- clust$size
-    # number of observations with negative sil value (misclassified)
-    neg_sil <- rep(0, k)
+    
+    k <- clust$nbclust  # number of clusters 
+    clust_num <- map_chr(seq(1:k), ~paste("Cluster", .x))  # cluster number
+    wss <- round(clust$withinss, 2)  # ss-within
+    bss <- round(rep(clust$betweenss, k), 2)  # ss-between
+    nobs <- clust$size  # n observations per cluster
+    neg_sil <- rep(0, k)  # number of observations with negative sil value (misclassified)
     neg_sil_clust <- clust$silinfo$widths[, c("cluster","sil_width")] %>% 
         filter(sil_width < 0) %>% 
         group_by(cluster) %>% 
         summarize(neg_sil = n())
     neg_sil[neg_sil_clust$cluster] <- neg_sil_clust$neg_sil 
-    #bind elements to data frame
-    data.frame(clust_num, nobs, wss, bss, neg_sil) 
+    data.frame(clust_num, nobs, wss, bss, neg_sil)  #bind elements to data frame
 }
 
 # function to create sil table
 make_sil_table <- function(clust) {
     table <- get_sil_data(clust) %>% 
-    datatable(rownames = FALSE, 
-              colnames= c("Cluster", "N", "Within SS", "Between SS", "Neg. Silhouette"),
-              caption = htmltools::tags$caption(
-                  style = 'caption-side: bottom; text-align: left;',
-                  htmltools::em('N = number of observations per cluster; SS = sum of squares')))
+        datatable(rownames = FALSE, 
+                  colnames= c("Cluster", "N", "Within SS", "Between SS", "Neg. Silhouette"),
+                  caption = htmltools::tags$caption(
+                      style = 'caption-side: bottom; text-align: left;',
+                      htmltools::em('N = number of observations per cluster; SS = sum of squares')))
     
     return(table)
-    }
+}
 
-# Dashboard header
+
+# Dashboard header --------------------------------------------------------
+
 header <-
     dashboardHeader(title = "K-means Clustering of Pokemon Data")
 
-# Dashboard sidebar
+
+# Dashboard sidebar -------------------------------------------------------
+
 sidebar <- dashboardSidebar(
     sidebarMenu(
         menuItem("Intro to clustering", tabName = "intro", icon = icon("info-circle")),
@@ -78,7 +82,9 @@ sidebar <- dashboardSidebar(
     )
 )
 
-# Dashboard body
+
+# Dashboard body ----------------------------------------------------------
+
 body <- dashboardBody(
     tabItems(
         # clustplot tab content
@@ -98,7 +104,7 @@ body <- dashboardBody(
                                     selected = "clust2")
                     )
                 )),
-        
+        # silplot tab content
         tabItem(tabName = "silplot",
                 fluidRow(
                     box(plotOutput("silplot", height = 250)),
@@ -115,18 +121,18 @@ body <- dashboardBody(
                                     selected = "clust2")
                     )
                 )
-        ),
-        
-        # Second tab content
-        tabItem(tabName = "widgets",
-                h2("Widgets tab content"))
+        )
     )
 )
 
-# user interface
+
+# User interface ----------------------------------------------------------
+
 ui <- dashboardPage(header, sidebar, body)
 
-# server
+
+# Server ------------------------------------------------------------------
+
 server <- function(input, output) {
     
     
