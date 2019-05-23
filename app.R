@@ -76,7 +76,7 @@ sidebar <- dashboardSidebar(
         menuItem("Intro to clustering", tabName = "intro", icon = icon("info-circle")),
         menuItem("Cluster Plot", tabName = "clustplot", icon = icon("cookie")),
         menuItem("Silhuoette Plot", tabName = "silplot", icon = icon("chart-area")),
-        menuItem("Scatter Plot", tabName = "scatplot", icon = icon("chart-scatter")),
+        menuItem("Scatter Plot", tabName = "scatplot", icon = icon("braille")),
         selectInput(inputId = "clusters",
                     label = "Number of centroids:",
                     c("2" = "clust2", # turn this into a function!
@@ -95,20 +95,19 @@ body <- dashboardBody(
         # clustplot tab content
         tabItem(tabName = "clustplot",
                 fluidRow(
-                    box(plotOutput("clustplot", height = 500)))),
+                    box(plotOutput("clustplot")))),
                 
         # silplot tab content
         tabItem(tabName = "silplot",
                 fluidRow(
-
-                    box(plotOutput("silplot", height = 500))),
+                    box(plotOutput("silplot"))),
                 fluidRow(
                     box(DTOutput("summarytable")))),
         
         # scatplot tab content
         tabItem(tabName = "scatplot",
                 fluidRow(
-                    box(plotOutput("scatplot", height = 500))))
+                    box(plotOutput("scatplot"))))
         )
     )
 
