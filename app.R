@@ -75,9 +75,16 @@ sidebar <- dashboardSidebar(
         menuItem("Intro to clustering", tabName = "intro", icon = icon("info-circle")),
         menuItem("Cluster Plot", tabName = "clustplot", icon = icon("cookie")),
         menuItem("Silhuoette Plot", tabName = "silplot", icon = icon("chart-area")),
-        menuItem("Scatter Plot", tabName = "scatplot", icon = icon("chart-scatter"))
-    )
-)
+        menuItem("Scatter Plot", tabName = "scatplot", icon = icon("chart-scatter")),
+        selectInput(inputId = "clusters",
+                    label = "Number of centroids:",
+                    c("2" = "clust2", # turn this into a function!
+                      "3" = "clust3", 
+                      "4" = "clust4", 
+                      "5" = "clust5",
+                      "6" = "clust6"),
+                    selected = "clust2")
+    ))
 
 
 # Dashboard body ----------------------------------------------------------
@@ -87,51 +94,17 @@ body <- dashboardBody(
         # clustplot tab content
         tabItem(tabName = "clustplot",
                 fluidRow(
-                    box(plotOutput("clustplot", height = 250)),
-                    
-                    box(
-                        title = "Controls",
-                        selectInput("clusters",
-                                    "Number of centroids to try:",
-                                    c("2" = "clust2", # turn this into a function!
-                                      "3" = "clust3", 
-                                      "4" = "clust4", 
-                                      "5" = "clust5",
-                                      "6" = "clust6"),
-                                    selected = "clust2")
-                    )
-                )),
+                    box(plotOutput("clustplot", height = 250)))),
+                
         # silplot tab content
         tabItem(tabName = "silplot",
                 fluidRow(
-                    box(plotOutput("silplot", height = 250)),
-                    
-                    box(
-                        title = "Controls",
-                        selectInput("clusters",
-                                    "Number of centroids to try:",
-                                    c("2" = "clust2", 
-                                      "3" = "clust3", 
-                                      "4" = "clust4", 
-                                      "5" = "clust5",
-                                      "6" = "clust6"),
-                                    selected = "clust2")))),
+                    box(plotOutput("silplot", height = 250)))),
         
         # scatplot tab content
         tabItem(tabName = "scatplot",
                 fluidRow(
-                    box(plotOutput("scatplot", height = 250)),
-                    
-                    box(
-                        title = "Controls",
-                        selectInput("clusters",
-                                    "Number of centroids to try:",
-                                    c("2" = "clust2", 
-                                      "3" = "clust3", 
-                                      "4" = "clust4", 
-                                      "5" = "clust5",
-                                      "6" = "clust6"),
-                                    selected = "clust2"))))
+                    box(plotOutput("scatplot", height = 250))))
         )
     )
 
