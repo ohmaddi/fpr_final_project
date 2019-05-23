@@ -4,6 +4,20 @@ library(factoextra)
 library(here)
 library(R.utils)
 library(tidyverse)
+library(magrittr)
+library(janitor)
+library(tidyr)
+
+# Read in pokemone data
+pokemon_data <- clean_names(read.csv("pokemon.csv"))  %>% 
+    select(-percentage_male, -type2) %>%  
+    filter(type1 %in% c("ghost", "fairy", "dragon")) %>%  # Let's limit this to a few pokemon
+    mutate(type1 = droplevels(type1)) %>% # Few poke have data for these
+    drop_na()
+pokemon_type <- pokemon_data$type1
+pokemon_data <- pokemon_data %>% 
+    select(starts_with("against"), hp) %>% 
+    scale() %>% as.data.frame()
 
 ## Load in output from k-means clustering
 #  turn this into a function!
