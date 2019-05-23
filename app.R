@@ -95,14 +95,18 @@ body <- dashboardBody(
         # clustplot tab content
         tabItem(tabName = "clustplot",
                 fluidRow(
-                    box(plotOutput("clustplot")))),
+                    box(plotOutput("clustplot"))),
+                fluidRow(
+                    box(DTOutput("summarytable1")))),
+
                 
         # silplot tab content
         tabItem(tabName = "silplot",
                 fluidRow(
+
                     box(plotOutput("silplot"))),
                 fluidRow(
-                    box(DTOutput("summarytable")))),
+                    box(DTOutput("summarytable2")))),
         
         # scatplot tab content
         tabItem(tabName = "scatplot",
@@ -159,12 +163,17 @@ server <- function(input, output) {
                 theme_minimal()
         })
     
-    output$summarytable <- 
+    output$summarytable1 <- 
         renderDT({
             data <- get(input$clusters)
             make_summary_table(data)
         })
     
+    output$summarytable2 <- 
+        renderDT({
+            data <- get(input$clusters)
+            make_summary_table(data)
+        })
 }
 
 shinyApp(ui, server)
