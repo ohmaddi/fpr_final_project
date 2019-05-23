@@ -65,7 +65,8 @@ make_summary_table <- function(clust) {
 # Dashboard header --------------------------------------------------------
 
 header <-
-    dashboardHeader(title = "K-means Clustering of Pokemon Data")
+    dashboardHeader(title = "K-means Clustering of Pokemon Data",
+                    titleWidth = 450)
 
 
 # Dashboard sidebar -------------------------------------------------------
@@ -94,19 +95,23 @@ body <- dashboardBody(
         # clustplot tab content
         tabItem(tabName = "clustplot",
                 fluidRow(
-                    box(plotOutput("clustplot", height = 250)))),
+                    box(plotOutput("clustplot", height = 500)))),
                 
         # silplot tab content
         tabItem(tabName = "silplot",
                 fluidRow(
+<<<<<<< HEAD
                     box(plotOutput("silplot", height = 250))),
                 fluidRow(
                     box(DTOutput("summarytable")))),
+=======
+                    box(plotOutput("silplot", height = 500)))),
+>>>>>>> b096631ee3cf2ec605c38f13fdf1b2f878054a96
         
         # scatplot tab content
         tabItem(tabName = "scatplot",
                 fluidRow(
-                    box(plotOutput("scatplot", height = 250))))
+                    box(plotOutput("scatplot", height = 500))))
         )
     )
 
