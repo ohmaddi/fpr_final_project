@@ -4,6 +4,7 @@ library(factoextra)
 library(here)
 library(R.utils)
 library(tidyverse)
+library(DT)
 
 ## Load in output from k-means clustering
 #  turn this into a function!
@@ -16,7 +17,7 @@ clust6 <- loadObject(here("kmeans/clust6.Rda"))
 
 ## Define functions for creating tables
 
-# silhouette table data
+# function to create data for silhouette table
 get_sil_data <- function(clust){
     # number of clusters 
     k <- clust$nbclust
@@ -39,11 +40,23 @@ get_sil_data <- function(clust){
     data.frame(clust_num, nobs, wss, bss, neg_sil) 
 }
 
+# function to create sil table
+make_sil_table <- function(clust) {
+    table <- get_sil_data(clust) %>% 
+    datatable(rownames = FALSE, 
+              colnames= c("Cluster", "N", "Within SS", "Between SS", "Neg. Silhouette"),
+              caption = htmltools::tags$caption(
+                  style = 'caption-side: bottom; text-align: left;',
+                  htmltools::em('N = number of observations per cluster; SS = sum of squares')))
+    
+    return(table)
+    }
 
-
+# Dashboard header
 header <-
     dashboardHeader(title = "K-means Clustering of Pokemon Data")
 
+# Dashboard sidebar
 sidebar <- dashboardSidebar(
     sidebarMenu(
         menuItem("Intro to clustering", tabName = "intro", icon = icon("info-circle")),
@@ -53,6 +66,7 @@ sidebar <- dashboardSidebar(
     )
 )
 
+# Dashboard body
 body <- dashboardBody(
     tabItems(
         # clustplot tab content
@@ -97,9 +111,10 @@ body <- dashboardBody(
     )
 )
 
+# user interface
 ui <- dashboardPage(header, sidebar, body)
 
-
+# server
 server <- function(input, output) {
     
     
