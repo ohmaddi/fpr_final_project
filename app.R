@@ -1,15 +1,44 @@
 ## app.R ##
 library(shinydashboard)
-library(ggplot2)
 library(factoextra)
 library(here)
 library(R.utils)
+library(tidyverse)
 
+## Load in output from k-means clustering
+#  turn this into a function!
 clust2 <- loadObject(here("kmeans/clust2.Rda"))
 clust3 <- loadObject(here("kmeans/clust3.Rda"))
 clust4 <- loadObject(here("kmeans/clust4.Rda"))
 clust5 <- loadObject(here("kmeans/clust5.Rda"))
 clust6 <- loadObject(here("kmeans/clust6.Rda"))
+
+
+## Define functions for creating tables
+
+# silhouette table data
+get_sil_data <- function(clust){
+    # number of clusters 
+    k <- clust$nbclust
+    # cluster number
+    clust_num <- map_chr(seq(1:k), ~paste("Cluster", .x))
+    # ss-within
+    wss <- round(clust$withinss, 2)
+    # ss-between
+    bss <- round(rep(clust$betweenss, k), 2)
+    # n observations per cluster
+    nobs <- clust$size
+    # number of observations with negative sil value (misclassified)
+    neg_sil <- rep(0, k)
+    neg_sil_clust <- clust$silinfo$widths[, c("cluster","sil_width")] %>% 
+        filter(sil_width < 0) %>% 
+        group_by(cluster) %>% 
+        summarize(neg_sil = n())
+    neg_sil[neg_sil_clust$cluster] <- neg_sil_clust$neg_sil 
+    #bind elements to data frame
+    data.frame(clust_num, nobs, wss, bss, neg_sil) 
+}
+
 
 
 header <-
@@ -35,7 +64,7 @@ body <- dashboardBody(
                         title = "Controls",
                         selectInput("clusters",
                                     "Number of centroids to try:",
-                                    c("2" = "clust2", 
+                                    c("2" = "clust2", # turn this into a function!
                                       "3" = "clust3", 
                                       "4" = "clust4", 
                                       "5" = "clust5",
