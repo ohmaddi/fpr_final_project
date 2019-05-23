@@ -65,7 +65,8 @@ make_sil_table <- function(clust) {
 # Dashboard header --------------------------------------------------------
 
 header <-
-    dashboardHeader(title = "K-means Clustering of Pokemon Data")
+    dashboardHeader(title = "K-means Clustering of Pokemon Data",
+                    titleWidth = 450)
 
 
 # Dashboard sidebar -------------------------------------------------------
@@ -94,17 +95,17 @@ body <- dashboardBody(
         # clustplot tab content
         tabItem(tabName = "clustplot",
                 fluidRow(
-                    box(plotOutput("clustplot", height = 250)))),
+                    box(plotOutput("clustplot", height = 500)))),
                 
         # silplot tab content
         tabItem(tabName = "silplot",
                 fluidRow(
-                    box(plotOutput("silplot", height = 250)))),
+                    box(plotOutput("silplot", height = 500)))),
         
         # scatplot tab content
         tabItem(tabName = "scatplot",
                 fluidRow(
-                    box(plotOutput("scatplot", height = 250))))
+                    box(plotOutput("scatplot", height = 500))))
         )
     )
 
