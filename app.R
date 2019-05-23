@@ -17,29 +17,47 @@ header <-
 
 sidebar <- dashboardSidebar(
     sidebarMenu(
-        menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
-        menuItem("Widgets", tabName = "widgets", icon = icon("th"))
+        menuItem("Intro to clustering", tabName = "intro", icon = icon("info-circle")),
+        menuItem("Cluster Plot", tabName = "clustplot", icon = icon("cookie")),
+        menuItem("Silhuoette Plot", tabName = "silplot", icon = icon("chart-area")),
+        menuItem("Scatter Plot", tabName = "scatplot", icon = icon("chart-scatter"))
     )
 )
 
 body <- dashboardBody(
     tabItems(
-        # First tab content
-        tabItem(tabName = "dashboard",
+        # clustplot tab content
+        tabItem(tabName = "clustplot",
                 fluidRow(
-                    box(plotOutput("plot1", height = 250)),
-                    box(plotOutput("plot2", height = 250)),
+                    box(plotOutput("clustplot", height = 250)),
                     
                     box(
                         title = "Controls",
                         selectInput("clusters",
-                                     "Number of centroids to try:",
+                                    "Number of centroids to try:",
                                     c("2" = "clust2", 
-                                                 "3" = "clust3", 
-                                                 "4" = "clust4", 
-                                                 "5" = "clust5",
-                                                 "6" = "clust6"),
-                                     selected = "clust2")
+                                      "3" = "clust3", 
+                                      "4" = "clust4", 
+                                      "5" = "clust5",
+                                      "6" = "clust6"),
+                                    selected = "clust2")
+                    )
+                )),
+        
+        tabItem(tabName = "silplot",
+                fluidRow(
+                    box(plotOutput("silplot", height = 250)),
+                    
+                    box(
+                        title = "Controls",
+                        selectInput("clusters",
+                                    "Number of centroids to try:",
+                                    c("2" = "clust2", 
+                                      "3" = "clust3", 
+                                      "4" = "clust4", 
+                                      "5" = "clust5",
+                                      "6" = "clust6"),
+                                    selected = "clust2")
                     )
                 )
         ),
@@ -55,8 +73,8 @@ ui <- dashboardPage(header, sidebar, body)
 
 server <- function(input, output) {
     
-
-    output$plot1 <-
+    
+    output$silplot <-
         renderPlot({
             data <- get(input$clusters)
             fviz_silhouette(
@@ -67,7 +85,7 @@ server <- function(input, output) {
             )
         })
     
-    output$plot2 <-
+    output$clustplot <-
         renderPlot({
             data <- get(input$clusters)
             data$clust_plot
