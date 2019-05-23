@@ -8,7 +8,7 @@ library(janitor)
 library(DT)
 
 
-# Read in pokemone data ---------------------------------------------------
+# Read in pokemon data ---------------------------------------------------
 
 pokemon_data <- clean_names(read.csv("pokemon.csv"))  %>% 
     select(-percentage_male, -type2) %>%  
@@ -33,7 +33,7 @@ clust6 <- loadObject(here("kmeans/clust6.Rda"))
 # Custom functinos --------------------------------------------------------
 
 # function to create data for silhouette table
-get_sil_data <- function(clust){
+get_summary_data <- function(clust){
     
     k <- clust$nbclust  # number of clusters 
     clust_num <- map_chr(seq(1:k), ~paste("Cluster", .x))  # cluster number
@@ -50,8 +50,8 @@ get_sil_data <- function(clust){
 }
 
 # function to create sil table
-make_sil_table <- function(clust) {
-    table <- get_sil_data(clust) %>% 
+make_summary_table <- function(clust) {
+    table <- get_summary_data(clust) %>% 
         datatable(rownames = FALSE, 
                   colnames = c("Cluster", "N", "Within SS", "Between SS", "Neg. Silhouette"),
                   caption = htmltools::tags$caption(
@@ -99,7 +99,9 @@ body <- dashboardBody(
         # silplot tab content
         tabItem(tabName = "silplot",
                 fluidRow(
-                    box(plotOutput("silplot", height = 250)))),
+                    box(plotOutput("silplot", height = 250))),
+                fluidRow(
+                    box(DTOutput("summarytable")))),
         
         # scatplot tab content
         tabItem(tabName = "scatplot",
@@ -154,6 +156,12 @@ server <- function(input, output) {
                 coord_flip() +
                 facet_wrap(~type) +
                 theme_minimal()
+        })
+    
+    output$summarytable <- 
+        renderDT({
+            data <- get(input$clusters)
+            make_summary_table(data)
         })
     
 }
