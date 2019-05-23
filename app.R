@@ -22,15 +22,12 @@ pokemon_data <- pokemon_data %>%
 
 
 # Load output from k-means clustering -------------------------------------
-
 #  turn this into a function!
 clust2 <- loadObject(here("kmeans/clust2.Rda"))
 clust3 <- loadObject(here("kmeans/clust3.Rda"))
 clust4 <- loadObject(here("kmeans/clust4.Rda"))
 clust5 <- loadObject(here("kmeans/clust5.Rda"))
 clust6 <- loadObject(here("kmeans/clust6.Rda"))
-
-
 
 
 # Custom functinos --------------------------------------------------------
@@ -56,7 +53,7 @@ get_sil_data <- function(clust){
 make_sil_table <- function(clust) {
     table <- get_sil_data(clust) %>% 
         datatable(rownames = FALSE, 
-                  colnames= c("Cluster", "N", "Within SS", "Between SS", "Neg. Silhouette"),
+                  colnames = c("Cluster", "N", "Within SS", "Between SS", "Neg. Silhouette"),
                   caption = htmltools::tags$caption(
                       style = 'caption-side: bottom; text-align: left;',
                       htmltools::em('N = number of observations per cluster; SS = sum of squares')))
@@ -118,12 +115,25 @@ body <- dashboardBody(
                                       "4" = "clust4", 
                                       "5" = "clust5",
                                       "6" = "clust6"),
-                                    selected = "clust2")
-                    )
-                )
+                                    selected = "clust2")))),
+        
+        # scatplot tab content
+        tabItem(tabName = "scatplot",
+                fluidRow(
+                    box(plotOutput("scatplot", height = 250)),
+                    
+                    box(
+                        title = "Controls",
+                        selectInput("clusters",
+                                    "Number of centroids to try:",
+                                    c("2" = "clust2", 
+                                      "3" = "clust3", 
+                                      "4" = "clust4", 
+                                      "5" = "clust5",
+                                      "6" = "clust6"),
+                                    selected = "clust2"))))
         )
     )
-)
 
 
 # User interface ----------------------------------------------------------
@@ -135,7 +145,7 @@ ui <- dashboardPage(header, sidebar, body)
 
 server <- function(input, output) {
     
-    
+    # Silhuoette plot
     output$silplot <-
         renderPlot({
             data <- get(input$clusters)
@@ -147,10 +157,30 @@ server <- function(input, output) {
             )
         })
     
+    # Cluster plot
     output$clustplot <-
         renderPlot({
             data <- get(input$clusters)
             data$clust_plot
+        })
+    
+    # Scatterplot
+    output$scatplot <- 
+        renderPlot({
+            data <- get(input$clusters)
+            plot_data <- cbind(data$cluster, pokemon_data, pokemon_type) %>%  
+                rename(cluster = 1) %>%
+                mutate(cluster = as.character(cluster),
+                       type = as.character(pokemon_type)) %>%
+                gather(value = value, key = variable_name,-type,-cluster)
+            
+            # Plot clusters by pokemon type
+            plot_data %>% 
+                ggplot(aes(x = variable_name, y = value, color = cluster)) +
+                geom_jitter(alpha = 0.6) + 
+                coord_flip() +
+                facet_wrap(~type) +
+                theme_minimal()
         })
     
 }
