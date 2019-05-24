@@ -118,8 +118,8 @@ body <- dashboardBody(
         # clustplot tab content
         tabItem(tabName = "clustplot",
                 fluidRow(
-                    box(plotOutput("clustplot"), width = 8),
-                    box(DTOutput("summarytable1"), width = 4)),
+                    box(plotOutput("clustplot"), width = 6),
+                    box(DTOutput("summarytable1"), width = 6)),
                 fluidRow(
                     box("Explanatory text goes here", width = 12))
                 ),
@@ -128,8 +128,8 @@ body <- dashboardBody(
         # silplot tab content
         tabItem(tabName = "silplot",
                 fluidRow(
-                    box(plotOutput("silplot"), width = 8),
-                    box(DTOutput("summarytable2"), width = 4)),
+                    box(plotOutput("silplot"), width = 6),
+                    box(DTOutput("summarytable2"), width = 6)),
                 fluidRow(
                     box("Explanatory text goes here", width = 12))
         ),
