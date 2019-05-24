@@ -141,7 +141,12 @@ body <- dashboardBody(
                     box(plotOutput("silplot"), width = 6),
                     box(DTOutput("summarytable2"), width = 6)),
                 fluidRow(
-                    box("Explanatory text goes here", width = 12))
+                    box("A silhouette plot shows cluster distance, a combination of within cluster compactness and of between cluster separation. 
+                        A silhouette coefficient closer to 1 means that the data are well classified, whereas a coefficient near 0 
+                        means observations are between clusters. A negative silhouette coefficient means observations are likely misclassified 
+                        and that the data do not group well with any of the identified clusters. The height of each cluster in this plot 
+                        represents the number of observations per cluster. Generally, we want clusters to be of roughly the same size, which we can gain 
+                        information about by examining the silhouette plot.", width = 12))
         ),
         
         # scatplot tab content
@@ -168,13 +173,20 @@ server <- function(input, output) {
     output$silplot <-
         renderPlot({
             data <- get(input$clusters)
-            fviz_silhouette(
-                data,
-                palette = "jco",
-                print.summary = FALSE,
-                ggtheme = theme_minimal()
-            )
+            data <- data$silinfo$widths
+
+            ggplot(data, aes(x = seq_along(cluster), y = sil_width, fill = cluster, color = cluster)) +
+                geom_col() +
+                coord_flip() +
+                geom_hline(yintercept = mean(data$sil_width, na.rm = TRUE), linetype = 2, size = .7) +
+                scale_fill_OkabeIto() +
+                scale_color_OkabeIto() +
+                theme_minimal() + 
+                labs(title = paste0("Average Silhouette Width = ", round(mean(data$sil_width, na.rm = TRUE), 2)),
+                     x = NULL,
+                     y = "Silhouette width") 
         })
+    
     
     # Cluster plot
     output$clustplot <-
