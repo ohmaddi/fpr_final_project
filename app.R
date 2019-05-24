@@ -149,7 +149,15 @@ body <- dashboardBody(
                 fluidRow(
                     box(plotOutput("scatplot"), width = 12)),
                 fluidRow(
-                    box("Explanatory text goes here", width = 12)))
+                    box(width = 12, "K-means clustering is a form of unsupervised learning, meaning that it is intended to find grouping structure in unlabeled data.
+                        However, we know that the pokemon in this dataset already 'grouped' by type of pokemon. 
+                        So, we might want to ask how well the clusters we have identified in the data set map onto this pre-existing grouping variable, pokemon type.
+                        Here we show a scatterplot that is faceted by 3 popular types of pokemon: dragon, fairy, and ghost. Rather than showing the raw data from the original variables that were fed into the 
+                        k-means clustering algorithm, we used principal components analysis (PCA) to reduce the data for simplicity of visualization. Here we show the 
+                        first 3 principal components. You will notice that with a 3-cluster solution, the clusters perfectly map onto the 3 types of pokemon. This is apparent from the fact that 
+                        each pokemon type only contains a single color. However, with alternative clustering solutions, we see a mix of colors within each pokemon type, meaning that 
+                        cluster membership is not completely corresponding to pokemon type. In general, greater mixing of colors across pokemon types corresponds to a weaker relationship between 
+                        the identified clusters in the data and pokemon type.")))
         )
     )
 
