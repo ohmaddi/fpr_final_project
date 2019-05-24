@@ -6,6 +6,7 @@ library(R.utils)
 library(tidyverse)
 library(janitor)
 library(DT)
+library(colorblindr)
 
 
 # Read in pokemon data ---------------------------------------------------
@@ -70,17 +71,22 @@ make_summary_table <- function(clust) {
 
 scatplot <- function(data){
     pca_data <- prcomp(pokemon_data)
-    plot_data <- data.frame(pokemon_type, data$cluster, pca_data$x[, 1:6]) %>% 
+    plot_data <- data.frame(pokemon_type, data$cluster, pca_data$x[, 1:3]) %>% 
         rename(cluster = 2) %>% 
         gather(starts_with("PC"), value = value, key = principal_component)  
     
     # Plot clusters by pokemon type
+    facet_labels <- c(dragon = "Dragon", fairy = "Fairy", ghost = "Ghost")
+    
     plot_data %>% 
         ggplot(aes(x = principal_component, y = value, color = factor(cluster))) +
-        geom_point(position = position_jitter(width = 0.4), alpha = 0.6) + 
+        geom_point(position = position_jitter(width = 0.5), alpha = 0.3, size = 5) + 
         coord_flip() +
-        facet_wrap(~pokemon_type) +
-        theme_minimal()
+        scale_fill_OkabeIto() +
+        labs(x = "Principal Component \n", y = "") + 
+        facet_wrap(~pokemon_type, labeller = labeller(pokemon_type = facet_labels)) +
+        theme_minimal(base_size = 17) + 
+        theme(panel.grid.minor = element_blank())
 }
 
 
@@ -137,7 +143,9 @@ body <- dashboardBody(
         # scatplot tab content
         tabItem(tabName = "scatplot",
                 fluidRow(
-                    box(plotOutput("scatplot"))))
+                    box(plotOutput("scatplot"), width = 12)),
+                fluidRow(
+                    box("Explanatory text goes here", width = 12)))
         )
     )
 
