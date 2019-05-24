@@ -115,6 +115,10 @@ sidebar <- dashboardSidebar(
 
 body <- dashboardBody(
     tabItems(
+        # Intro tab content
+        tabItem(tabName = "intro",
+                    box("This dashboard is the final project for an R functional programming class. We use the Kaggle Pokemon dataset (available here [placeholder]) to demonstrate how different visualization of k-means clustering can provide help determine how well a clustering solution fits the data.", width = 12)),
+        
         # clustplot tab content
         tabItem(tabName = "clustplot",
                 fluidRow(
