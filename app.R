@@ -80,7 +80,7 @@ scatplot <- function(data){
     
     plot_data %>% 
         ggplot(aes(x = principal_component, y = value, color = factor(cluster))) +
-        geom_point(position = position_jitter(width = 0.5), alpha = 0.3, size = 5) + 
+        geom_point(position = position_jitter(width = 0.5), alpha = 0.6, size = 5) + 
         coord_flip() +
         scale_color_OkabeIto() +
         labs(x = "Principal Component \n", y = "") + 
