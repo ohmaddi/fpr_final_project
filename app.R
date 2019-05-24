@@ -22,13 +22,18 @@ pokemon_data <- pokemon_data %>%
 
 
 # Load output from k-means clustering -------------------------------------
-#  turn this into a function!
-clust2 <- loadObject(here("kmeans/clust2.Rda"))
-clust3 <- loadObject(here("kmeans/clust3.Rda"))
-clust4 <- loadObject(here("kmeans/clust4.Rda"))
-clust5 <- loadObject(here("kmeans/clust5.Rda"))
-clust6 <- loadObject(here("kmeans/clust6.Rda"))
 
+get_filenames <- function(folder) {
+    files <- list.files(here(glue::glue("{folder}/")))
+    map_chr(files, ~word(.x, sep = "\\."))
+}
+
+load_clustdata <- function(file) {
+    temp <- loadObject(here(glue::glue("kmeans/{file}.Rda")))
+    assign(file, temp, envir = .GlobalEnv)
+    }
+
+map(get_filenames("kmeans"), ~load_clustdata(.x))
 
 # Custom functinos --------------------------------------------------------
 
