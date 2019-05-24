@@ -131,7 +131,7 @@ body <- dashboardBody(
                     box(plotOutput("clustplot"), width = 6),
                     box(DTOutput("summarytable1"), width = 6)),
                 fluidRow(
-                    box("Explanatory text goes here", width = 12))
+                    box("This plot shows the cluster results on the first two principal components of the data that were used to create them.", width = 12))
                 ),
 
                 
