@@ -118,18 +118,21 @@ body <- dashboardBody(
         # clustplot tab content
         tabItem(tabName = "clustplot",
                 fluidRow(
-                    box(plotOutput("clustplot"))),
+                    box(plotOutput("clustplot"), width = 8),
+                    box(DTOutput("summarytable1"), width = 4)),
                 fluidRow(
-                    box(DTOutput("summarytable1")))),
+                    box("Explanatory text goes here", width = 12))
+                ),
 
                 
         # silplot tab content
         tabItem(tabName = "silplot",
                 fluidRow(
-
-                    box(plotOutput("silplot"))),
+                    box(plotOutput("silplot"), width = 8),
+                    box(DTOutput("summarytable2"), width = 4)),
                 fluidRow(
-                    box(DTOutput("summarytable2")))),
+                    box("Explanatory text goes here", width = 12))
+        ),
         
         # scatplot tab content
         tabItem(tabName = "scatplot",
@@ -137,6 +140,7 @@ body <- dashboardBody(
                     box(plotOutput("scatplot"))))
         )
     )
+
 
 
 # User interface ----------------------------------------------------------
