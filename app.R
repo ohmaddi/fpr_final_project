@@ -66,6 +66,24 @@ make_summary_table <- function(clust) {
     return(table)
 }
 
+# Scatterplot function
+
+scatplot <- function(data){
+    pca_data <- prcomp(pokemon_data)
+    plot_data <- data.frame(pokemon_type, data$cluster, pca_data$x[, 1:6]) %>% 
+        rename(cluster = 2) %>% 
+        gather(starts_with("PC"), value = value, key = principal_component)  
+    
+    # Plot clusters by pokemon type
+    plot_data %>% 
+        ggplot(aes(x = principal_component, y = value, color = factor(cluster))) +
+        geom_point(position = position_jitter(width = 0.4), alpha = 0.6) + 
+        coord_flip() +
+        facet_wrap(~pokemon_type) +
+        theme_minimal()
+}
+
+
 
 # Dashboard header --------------------------------------------------------
 
@@ -153,20 +171,8 @@ server <- function(input, output) {
     output$scatplot <- 
         renderPlot({
             data <- get(input$clusters)
-            plot_data <- cbind(data$cluster, pokemon_data, pokemon_type) %>%  
-                rename(cluster = 1) %>%
-                mutate(cluster = as.character(cluster),
-                       type = as.character(pokemon_type)) %>%
-                gather(value = value, key = variable_name,-type,-cluster)
-            
-            # Plot clusters by pokemon type
-            plot_data %>% 
-                ggplot(aes(x = variable_name, y = value, color = cluster)) +
-                geom_jitter(alpha = 0.6) + 
-                coord_flip() +
-                facet_wrap(~type) +
-                theme_minimal()
-        })
+            scatplot(data)
+})
     
     output$summarytable1 <- 
         renderDT({
