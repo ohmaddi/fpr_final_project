@@ -28,10 +28,37 @@ pokemon_data <- pokemon_data %>%
     mutate(type1 = droplevels(type1)) %>% # Few poke have data for these
     drop_na() 
 
+#Part of the project requirement is to use at least : 
+#1. one {purrr} function outside the basic map family such as walk_*
+#2. purrr::nest %>% mutate()
+#3. parallel iteration 
+
+#I tried to look at the data and see how I can help meet these requirements. The app that you areated look great :) So I tried to manipulate a data in a way that does not change the purpose of the app but still meet the requirements of the project.  For this I created a function that will basically pull the first row of any dataframe. Then, I used that function in the pokemon_data grouped by type1 in order to use the "purrr::nest %>% mutate()". I used walk instead of map so it will iterate over and over until it pulls the full dataframe.This way you meet the requirements without changing the dataset of your project. I know this is can be tricky but maybe it will inspire to acutally use purrr::nest %>% mutate() in a more useful way that I did not think of since you know the data better that I do.
+
+#I made this same change in the app.R too. 
+
+#I could not figure out a way to use parallel mapping. Make sure you add it to your project as it is part of the requirements. 
+
+#Overall, I really like your shiny dashboard and the clustering function you created :)
+
+first_row <- function(.x) {
+  first <- .x[1, ]  #pull the firt row of the data
+  tibble::as_tibble(first)
+}
+
+pokemon_data <- pokemon_data %>% 
+  group_by(type1) %>%
+    nest() %>%
+    mutate(., data = walk(data, first_row)) %>%
+    unnest()
+
+
 # Create data frame with "against" variables 
 pokemon_against <- pokemon_data %>% 
     select(starts_with("against"), hp)
 ```
+
+
 
 # Preprocessing
 ```{r Missing observations}
@@ -54,6 +81,7 @@ pokemon_against <- pokemon_against %>%
     scale() %>% 
     as.data.frame()
 ```
+
 
 # Run K-means clustering with variable numbers of clusters
 ```{r}

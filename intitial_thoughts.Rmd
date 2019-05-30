@@ -68,6 +68,7 @@ plot_data %>%
     geom_jitter() + 
     facet_wrap(~pokemon_type)
 
+install.packages("R.utils")
 
 ```
 

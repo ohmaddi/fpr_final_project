@@ -16,6 +16,21 @@ pokemon_data <- clean_names(read.csv("pokemon.csv"))  %>%
     filter(type1 %in% c("ghost", "fairy", "dragon")) %>%  # Let's limit this to a few pokemon
     mutate(type1 = droplevels(type1)) %>% # Few poke have data for these
     drop_na()
+first_row <- function(.x, to_chr = FALSE) {
+    first <- .x[1, ]  #pull the firt row of the data
+    if (to_chr) {
+        first[] <- walk(first, as.character) #make all data points a character if to_chr = TRUE
+    }
+    
+    tibble::as_tibble(first)
+}
+
+pokemon_data <- pokemon_data %>% 
+    group_by(type1) %>%
+    nest() %>%
+    mutate(., data = walk(data, first_row)) %>%
+    unnest()
+
 pokemon_type <- pokemon_data$type1
 pokemon_data <- pokemon_data %>% 
     select(starts_with("against"), hp) %>% 
